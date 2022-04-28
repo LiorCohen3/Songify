@@ -1,6 +1,6 @@
 #include "Structs.h"
 #include "Album.h"
-album *create_album (char *name)
+album *create_album (char *name) // Creates and allocates memory for new album
 {
     album *temp = (album*)calloc(1,sizeof(album));
     if (temp == NULL)
@@ -22,83 +22,83 @@ album *create_album (char *name)
 }
 
 
-songify *add_song(songify *head, artist *destArtist, album *destAlbum, song *newSong)
+int check_album(songify *head, artist *destArtist, album *destAlbum) // checks if the given album is under the given artist in songify
 {
-    if (head == NULL || destArtist == NULL || destAlbum == NULL || newSong == NULL)
+    if (head == NULL || destArtist == NULL || destAlbum == NULL)
     {
         printf("Null Argument\n");
-        return NULL;
+        return -1;
     }
     artist *tempArtist = head->artists;
-    while (tempArtist != destArtist)
+    while (tempArtist != NULL)
     {
+        if (tempArtist == destArtist)
+        {
+            album *tempAlbum = destArtist->albums;
+            while (tempAlbum != NULL)
+            {
+                if (tempAlbum == destAlbum)
+                {
+                    return 1;
+                }
+                tempAlbum = tempAlbum->next;
+            }
+            printf("The album \"%s\" was not found under %s!\n",destAlbum->name,destArtist->name);
+            return -1;
+        }
         tempArtist = tempArtist->next;
     }
-    album *tempAlbum = tempArtist->albums;
-    while (tempAlbum != destAlbum)
-    {
-        tempAlbum = tempAlbum->next;
-    }
-    song *tempSong = tempAlbum->songs;
-    // int ID = song_count(head,tempArtist,tempAlbum);
-    // tempSong->ID = ID;
-    tempAlbum->songs = newSong;
-    tempAlbum->songs->next = tempSong;
-    return head;
+    printf("%s was not found in Songify database!\n",destArtist->name);
+    return -1;
 }
 
 
-int song_count(songify *head, artist *destArtist, album *destAlbum)
+songify *add_song(songify *head, artist *destArtist, album *destAlbum, song *newSong) // adds song to given album 
 {
-    if (head == NULL || destArtist == NULL || destAlbum == NULL)
+    int check = check_album(head,destArtist,destAlbum);
+    if (check == 1)
     {
-        printf("Null Argument\n");
-        return -1;
+        song *tempSong = destAlbum->songs;
+        newSong->ID = song_count(head,destArtist,destAlbum);
+        destAlbum->songs = newSong;
+        destAlbum->songs->next = tempSong;
+        return head;
     }
-    // artist *tempArtist = head->artists;
-    // while (tempArtist != destArtist)
-    // {
-    //     tempArtist = tempArtist->next;
-    // }
-    // album *tempAlbum = tempArtist->albums;
-    // while (tempAlbum != destAlbum)
-    // {
-    //     tempAlbum = tempAlbum->next;
-    // }
-    song *tempSong = destAlbum->songs;
-    int count = 0;
-    while (tempSong != NULL)
-    {
-        count++;
-        tempSong= tempSong->next;
-    }
-    return count;
+    return NULL;
 }
 
 
-int album_duration(songify *head, artist *destArtist, album *destAlbum)
+int song_count(songify *head, artist *destArtist, album *destAlbum) // returns song count in given album
 {
-    if (head == NULL || destArtist == NULL || destAlbum == NULL)
+    int check = check_album(head,destArtist,destAlbum);
+    if (check == 1)
     {
-        printf("Null Argument\n");
-        return -1;
+        song *tempSong = destAlbum->songs;
+        int count = 0;
+        while (tempSong != NULL)
+        {
+            count++;
+            tempSong = tempSong->next;
+        } 
+        return count;
     }
-    // artist *tempArtist = head->artists;
-    // while (tempArtist != destArtist)
-    // {
-    //     tempArtist = tempArtist->next;
-    // }
-    // album *tempAlbum = tempArtist->albums;
-    // while (tempAlbum != destAlbum)
-    // {
-    //     tempAlbum = tempAlbum->next;
-    // }
-    song *tempSong = destAlbum->songs;
-    int count = 0;
-    while (tempSong != NULL)
+    return -1;
+}
+
+
+int album_duration(songify *head, artist *destArtist, album *destAlbum) // returns a sum of songs duration in album in seconds
+{
+    int check = check_album(head,destArtist,destAlbum);
+    if (check == 1)
     {
-        count += tempSong->length;
-        tempSong= tempSong->next;
+        song *tempSong = destAlbum->songs;
+        int count = 0;
+        while (tempSong != NULL)
+        {
+            count += tempSong->length;
+            tempSong= tempSong->next;
+        }
+        return count;
     }
-    return count;
+    return -1;
 }

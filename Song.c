@@ -1,6 +1,6 @@
 #include "Structs.h"
 #include "Song.h"
-song *create_song(char *name, int length)
+song *create_song(char *name, int length) // Creates and allocates memory for a new song
 {
     song *temp = (song*)calloc(1,sizeof(song));
     if (temp == NULL)
@@ -23,62 +23,71 @@ song *create_song(char *name, int length)
     return temp;
 }
 
-void play_song(songify *head, artist *destArtist, album *destAlbum, song *destSong)
+int verify_song(songify *head, artist *destArtist, album *destAlbum, song *destSong) //Check if the given song is under the given album under the given artist in songify
 {
     if (head == NULL || destArtist == NULL || destAlbum == NULL || destSong == NULL)
     {
         printf("Null Argument\n");
-        return;
+        return -1;
     }
     artist *tempArtist = head->artists;
-    while (tempArtist != destArtist)
+    while (tempArtist != NULL)
     {
+        if (tempArtist == destArtist)
+        {
+            album *tempAlbum = destArtist->albums;
+            while (tempAlbum != NULL)
+            {
+                if (tempAlbum == destAlbum)
+                {
+                    song *tempSong = destAlbum->songs;
+                    while (tempSong != NULL)
+                    {
+                        if (tempSong == destSong)
+                        {
+                            return 1;
+                        }
+                        tempSong = tempSong->next;
+                    }
+                    printf("The song \"%s\" is not part of the album \"%s\"!\n",destSong->name,destAlbum->name);
+                    return -1;
+                }
+                tempAlbum = tempAlbum->next;
+            }
+            printf("The album \"%s\" was not found under %s!\n",destAlbum->name,destArtist->name);
+            return -1;
+        }
         tempArtist = tempArtist->next;
     }
-    album *tempAlbum = tempArtist->albums;
-    while (tempAlbum != destAlbum)
+    printf("%s was not found in Songify database!\n",destArtist->name);
+    return -1;
+}
+
+
+void play_song(songify *head, artist *destArtist, album *destAlbum, song *destSong) // plays song and prints if its liked
+{
+    int check = verify_song(head,destArtist,destAlbum,destSong);
+    if (check == 1)
     {
-        tempAlbum = tempAlbum->next;
-    }
-    song *tempSong = tempAlbum->songs;
-    while (tempSong != destSong)
-    {
-        tempSong = tempSong->next;
-    }
-    tempSong->timePlayed++;
-    if (tempSong->liked == TRUE)
-    {
-        printf("Now playing: %s. In favorites.\n",tempSong->name);
-    }
-    else
-    {
-        printf("Now playing: %s. Not in favorites\n",tempSong->name);
+        destSong->timePlayed++;
+        if (destSong->liked == TRUE)
+        {
+            printf("Now playing: \"%s\". In favorites.\n",destSong->name);
+        }
+        else
+        {
+            printf("Now playing: \"%s\". Not in favorites\n",destSong->name);
+        }
     }
     return;
 }
 
-void like_song(songify *head, artist *destArtist, album *destAlbum, song *destSong)
+void like_song(songify *head, artist *destArtist, album *destAlbum, song *destSong) // likes given song
 {
-    if (head == NULL || destArtist == NULL || destAlbum == NULL || destSong == NULL)
+    int check = verify_song(head,destArtist,destAlbum,destSong);
+    if (check == 1)
     {
-        printf("Null Argument\n");
-        return;
+        destSong->liked = TRUE;
     }
-    // artist *tempArtist = head->artists;
-    // while (tempArtist != destArtist)
-    // {
-    //     tempArtist = tempArtist->next;
-    // }
-    // album *tempAlbum = tempArtist->albums;
-    // while (tempAlbum != destAlbum)
-    // {
-    //     tempAlbum = tempAlbum->next;
-    // }
-    // song *tempSong = tempAlbum->songs;
-    // while (tempSong != destSong)
-    // {
-    //     tempSong = tempSong->next;
-    // }
-    destSong->liked = TRUE;
     return;
 }

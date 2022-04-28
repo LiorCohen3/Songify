@@ -1,6 +1,6 @@
 #include "Structs.h"
 #include "Artist.h"
-artist *create_artist (char *name, int firstYear, int lastYear)
+artist *create_artist (char *name, int firstYear, int lastYear) // Creates and allocates memory for new artist
 {
     artist *temp = (artist*)calloc(1,sizeof(artist));
     if (temp == NULL)
@@ -23,7 +23,7 @@ artist *create_artist (char *name, int firstYear, int lastYear)
     return temp;
 }
 
-songify *add_album (songify *head, artist *dest, album *newAlbum)
+songify *add_album (songify *head, artist *dest, album *newAlbum) // Adds album to artist in songify
 {
     if (head == NULL || dest == NULL || newAlbum == NULL)
     {
@@ -31,17 +31,22 @@ songify *add_album (songify *head, artist *dest, album *newAlbum)
         return NULL;
     }
     artist *temp = head->artists;
-    while (temp != dest)
+    while (temp != NULL)
     {
+        if (temp == dest)
+        {
+            album *tempAlbum = temp->albums;
+            temp->albums = newAlbum;
+            temp->albums->next = tempAlbum;
+            return head;
+        }
         temp = temp->next;
     }
-    album *tempAlbum = temp->albums;
-    temp->albums = newAlbum;
-    temp->albums->next = tempAlbum;
-    return head;
+    printf("%s was not found in Songify database!\n",dest->name);
+    return NULL;
 }
 
-void print_albums(songify *head, artist *toPrint)
+void print_albums(songify *head, artist *toPrint) // prints all albums under artist in songify
 {
     if (head == NULL || toPrint == NULL)
     {
@@ -49,15 +54,20 @@ void print_albums(songify *head, artist *toPrint)
         return;
     }
     artist *temp = head->artists;
-    while (temp != toPrint)
+    while (temp != NULL)
     {
+        if (temp == toPrint)
+        {
+            album *tempAlbum = toPrint->albums;
+            while (tempAlbum != NULL)
+            {
+                printf("%s\n",tempAlbum->name);
+                tempAlbum = tempAlbum->next;
+            }
+            return;
+        }
         temp = temp->next;
     }
-    album *tempAlbum = temp->albums;
-    while (tempAlbum != NULL)
-    {
-        printf("%s\n",tempAlbum->name);
-        tempAlbum = tempAlbum->next;
-    }
+    printf("%s was not found in Songify database!\n",toPrint->name);
     return;
 }
