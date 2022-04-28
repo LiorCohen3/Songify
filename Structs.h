@@ -1,8 +1,8 @@
-#include<stdio.h>
-#include"Songify.h"
-#include"Song.h"
-#include"Artist.h"
-#include"Album.h"
+#ifndef STRUCTS_H
+#define STRUCTS_H
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 typedef enum booli
 {
     FALSE,
@@ -16,14 +16,14 @@ typedef struct song
     int length; //The length of the song in seconds
     int timePlayed; //How many times the song have been played
     enum booli liked; //The user liked the song
-    song* next;
+    struct song* next;
 } song;
 
 typedef struct album
 {
     char* name;
     song* songs; //A LinkedList of songs
-    album* next;
+    struct album* next;
 } album;
 
 typedef struct activeYears
@@ -37,10 +37,12 @@ typedef struct artist
     char* name; //A LinkedList of
     struct activeYears active;
     album* albums; //A LinkedList of albums
-    artist* next;
+    struct artist* next;
 } artist;
 
 typedef struct songify
 {
     artist* artists;
 } songify;
+
+#endif
